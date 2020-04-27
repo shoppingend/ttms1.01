@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.ttms.product.dao.ProductTypeDao">
+
+	<!-- 查询所有分类以及这个分类的父类名称 -->
+	<select id="findObjects" resultType="map">
+	<!-- plan1 -->
+		SELECT
+		c.*, c1.name
+		parentName
+		FROM
+		tms_classes c
+		LEFT JOIN tms_classes c1 ON c.parentId =
+		c1.id
+	<!-- plan2
+		SELECT
+		c.*, (
+		SELECT
+		NAME parentName
+		FROM
+		tms_classes c1
+		WHERE
+		c.parentId = c1.id
+		)
+		FROM
+		tms_classes c
+	 -->
+	</select>
+	
+	<select id="hasChildren" resultType="Integer">
+		SELECT
+			count(*)
+		FROM
+			tms_classes
+		WHERE
+			parentId = #{id}
+	</select>
+	
+	<delete id="deleteObjects" parameterType="integer">
+		DELETE
+		FROM
+			tms_classes
+		WHERE
+			id = #{id}
+	</delete>
+	
+	<select id="findZtreeNodes" resultType="cn.tedu.ttms.common.vo.Node">
+		select id,parentId,name
+		from tms_classes
+	</select>
+
+	<insert id="insertObject" 
+			parameterType="productType"
+			useGeneratedKeys="true"
+			keyProperty="id">
+		INSERT INTO tms_classes (
+			NAME,
+			sort,
+			parentId,
+			note,
+			createdUser,
+			createdTime,
+			modifiedUser,
+			modifiedTime
+		)
+		VALUES
+			(
+				#{name},
+				#{sort},#{parentId},#{note},#{createdUser},now(),#{modifiedUser},now()
+			)
+	</insert>
+	
+	<select id="findObjectById" parameterType="Integer" resultType="map">
+		SELECT
+			c. NAME,
+			c.sort,
+			c.note,
+			c1. NAME parentName
+		FROM
+			tms_classes c
+		LEFT JOIN tms_classes c1 ON c.parentId = c1.id
+		WHERE
+			c.id = #{id}
+	</select>
+</mapper>
+
+

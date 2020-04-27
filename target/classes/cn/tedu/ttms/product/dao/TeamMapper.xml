@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.ttms.product.dao.TeamDao">
+
+    <sql id="whereQuery">
+        <where>
+            <if test="name!=null and name!=''">
+                p.name like concat("%",#{name},"%")
+            </if>
+        </where>
+    </sql>
+    
+    <select id="findPageObjects" resultType="map">
+         select t.*,p.name projectName
+         from tms_teams t join tms_projects p
+         on t.projectId=p.id
+         <include refid="whereQuery"/>
+         order by t.createdTime desc
+         limit #{startIndex},#{pageSize}
+    </select>
+    
+    <select id="getRowCount" resultType="int">
+        select count(*)
+        from tms_teams t join tms_projects p
+        on t.projectId=p.id
+        <include refid="whereQuery"/>
+    </select>
+
+	<insert id="insertObject" parameterType="team">
+		INSERT INTO tms_teams (
+			NAME,
+			projectId,
+			valid,
+			note,
+			createdTime,
+			modifiedTime,
+			createdUser,
+			modifiedUser
+		)
+		VALUES
+			(
+				#{name},#{projectId},#{valid},#{note},NOW(),NOW(),#{createdUser},#{modifiedUser}
+			)
+	</insert>
+
+	<select id="findObjectById" resultType="team">
+		select *
+		from tms_teams
+		where id=#{id}
+	</select>
+	
+	<update id="updateObject" parameterType="team">
+		UPDATE tms_teams
+		SET NAME = #{name},
+		projectId = #{projectId},
+		valid = #{valid},
+		note = #{note},
+		createdTime = NOW(),
+		modifiedTime = NOW(),
+		createdUser = #{createdUser},
+ 		modifiedUser = #{modifiedUser}
+		WHERE
+			id = #{id}
+	</update>
+	
+	<update id="validById">
+		UPDATE tms_teams
+		SET valid=#{valid}
+		WHERE id in
+		<foreach collection="ids"
+				open="("
+				close=")"
+				item="item"
+				separator=",">
+				#{item}
+		</foreach>
+	</update>
+</mapper>
+
+

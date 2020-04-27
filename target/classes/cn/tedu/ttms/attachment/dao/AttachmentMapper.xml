@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.ttms.attachment.dao.AttachmentDao">
+
+	<select id="findObjects" resultType="attachment">
+		select *
+		from tms_attachments
+	</select>
+
+	<select id="getRowCountByDigest" resultType="Integer">
+		select count(*)
+		from
+		tms_attachments
+		where fileDigest=#{fileDigest}
+	</select>
+
+	<insert id="insertObject" parameterType="attachment">
+		insert into
+		tms_attachments(
+		title,
+		fileName,
+		contentType,
+		filePath,
+		fileDigest,
+		athType,
+		belongId,
+		createdUser,
+		modifiedUser,
+		createdTime,
+		modifiedTime
+		)values(
+		#{title},
+		#{fileName},
+		#{contentType},
+		#{filePath},
+		#{fileDigest},
+		#{athType},
+		#{belongId},
+		#{createdUser},
+		#{modifiedUser},
+		NOW(),
+		NOW()
+		);
+	</insert>
+	
+	<select id="findObjectById" resultType="attachment">
+		select *
+		from tms_attachments
+		where id=#{id}
+	</select>
+</mapper>
